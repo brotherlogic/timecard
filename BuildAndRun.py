@@ -22,13 +22,8 @@ for line in os.popen('go build ./...').readlines():
 for line in os.popen('go build').readlines():
     print line.strip()
 
-size_1 = os.path.getsize('./old' + name)
-size_2 = os.path.getsize('./' + name)
-
 running = len(os.popen('ps -ef | grep ' + name).readlines()) > 3
 
               
-if size_1 != size_2 or new_hash != current_hash or not running:
-    for line in os.popen('killall ' + name).readlines():
-        pass
+if not running:
     subprocess.Popen(['./' + name])
