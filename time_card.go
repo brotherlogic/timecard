@@ -22,7 +22,7 @@ func build() pb.CardList {
 		card := pb.Card{}
 		card.Text = prepend(strconv.Itoa(now.Hour())) + ":" + prepend(strconv.Itoa(now.Minute()))
 		card.Hash = "timecard" + card.Text
-		card.Priority = 1
+		card.Priority = 0
 		card.ApplicationDate = now.Unix()
 
 		//Add a minute
