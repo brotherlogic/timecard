@@ -6,12 +6,23 @@ import "time"
 import "golang.org/x/net/context"
 import "google.golang.org/grpc"
 import pb "github.com/brotherlogic/cardserver/card"
+import pbdi "github.com/brotherlogic/discovery/proto"
 
 func prepend(str string) string {
 	if len(str) == 1 {
 		return "0" + str
 	}
 	return str
+}
+
+func getIP(servername string, ip string, port int) (string, int) {
+	conn, _ := grpc.Dial(ip+":"+strconv.Itoa(port), grpc.WithInsecure())
+	defer conn.Close()
+
+	registry := pbdi.NewDiscoveryServiceClient(conn)
+	entry := pbdi.RegistryEntry{Name: servername}
+	r, _ := registry.Discover(context.Background(), &entry)
+	return r.Ip, int(r.Port)
 }
 
 func build() pb.CardList {
@@ -37,7 +48,8 @@ func build() pb.CardList {
 
 func main() {
 	cards := build()
-	conn, err := grpc.Dial("localhost:50055", grpc.WithInsecure())
+	server, port := getIP("cardserver", "10.0.1.17", 50055)
+	conn, err := grpc.Dial(server+":"+strconv.Itoa(port), grpc.WithInsecure())
 
 	defer conn.Close()
 	client := pb.NewCardServiceClient(conn)
